@@ -25,15 +25,10 @@ func main() {
 	validCount := 0
 
 	for _, debug := range debugs {
-		occurances := 0
+		min := string(debug.Password[debug.Min-1]) == debug.Char
+		max := string(debug.Password[debug.Max-1]) == debug.Char
 
-		for _, char := range debug.Password {
-			if string(char) == debug.Char {
-				occurances = occurances + 1
-			}
-		}
-
-		if debug.Min <= occurances && occurances <= debug.Max {
+		if (min || max) && !(min && max) {
 			validCount = validCount + 1
 		}
 	}
