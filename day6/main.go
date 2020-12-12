@@ -12,29 +12,26 @@ func main() {
 		log.Fatalf("readLines: %s", err)
 	}
 
-	var grades []int
-	var groupAnswers string
-	summed := 0
+	groupNumber := 0
+	allYes := []int{}
+	groupAnswer := []string{}
 
 	for i, line := range lines {
-		if line != "" {
-			groupAnswers = groupAnswers + line
+		if line == "" || i+1 == len(lines) {
+			groupNumber++
+			allYes = append(allYes, countMatchingChars(groupAnswer))
+			groupAnswer = []string{}
 		} else {
-			// End group on newline
-			grades = append(grades, countUniqueChars(groupAnswers))
-			summed = summed + countUniqueChars(groupAnswers)
-			groupAnswers = ""
-		}
-
-		// End group on eof
-		if i+1 == len(lines) {
-			grades = append(grades, countUniqueChars(groupAnswers))
-			summed = summed + countUniqueChars(groupAnswers)
-			groupAnswers = ""
+			groupAnswer = append(groupAnswer, line)
 		}
 	}
 
-	log.Println(len(grades), summed)
+	matches := 0
+	for _, match := range allYes {
+		matches += match
+	}
+
+	log.Println(matches)
 }
 
 func readLines(path string) ([]string, error) {
