@@ -5,18 +5,34 @@ import (
 )
 
 func TestParseString(t *testing.T) {
-	got := ParseString("jhsd3jhsd44hj8d")
-	want := 38
-
-	if got != want {
-		t.Errorf("got %d, wanted %d", got, want)
+	tests := []struct {
+		Name string
+		Input string
+		Output int
+	}{
+		{
+			Name: "can parse a typical input",
+			Input: "jhsd3jhsd44hj8d",
+			Output: 38,
+		},
+		{
+			Name: "can parse a single digit input",
+			Input: "5",
+			Output: 55,
+		},
+		{
+			Name: "can parse a single alpha input",
+			Input: "a",
+			Output: 0,
+		},
 	}
 
-	got = ParseString("5")
-	want = 55
-
-	if got != want {
-		t.Errorf("got %d, wanted %d", got, want)
+	for _, tt := range tests {
+		t.Run(tt.Name, func(t *testing.T) {
+			if got := ParseString(tt.Input); got != tt.Output {
+				t.Errorf("got %d, wanted %d", got, tt.Output)
+			}
+		})
 	}
 } 
 
