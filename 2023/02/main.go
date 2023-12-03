@@ -34,9 +34,11 @@ func main() {
 	games, _ := ParseGameLogs(lines)
 
 	var part1 int
+	var part2 int
 	for _, game := range games {
 		id := game.ID
 		possible := true
+		part2 += game.Red * game.Blue * game.Green
 		for _, round := range *game.Rounds {
 			if !isPossible(round) {
 				possible = false
@@ -48,7 +50,7 @@ func main() {
 		}
 	}
 
-	fmt.Println(part1)
+	fmt.Println(part1, part2)
 }
 
 func ParseGameLogs(logs []string) ([]Game, []Round) {
@@ -80,9 +82,15 @@ func ParseGameLogs(logs []string) ([]Game, []Round) {
 			round.ID = id
 			*game.Rounds = append(*game.Rounds, round)
 
-			red += round.Red
-			blue += round.Blue
-			green += round.Green
+			if round.Red > red {
+				red = round.Red
+			}
+			if round.Blue > blue {
+				blue = round.Blue
+			}
+			if round.Green > green {
+				green = round.Green
+			}
 
 			rounds = append(rounds, round)
 		}
