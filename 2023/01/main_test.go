@@ -4,6 +4,33 @@ import (
 	"testing"
 )
 
+func TestReplaceMatches(t *testing.T) {
+	matches := []Match{
+		{ Matcher: "one", Replace: "1" },
+	}
+
+	tests := []struct {
+		Name string
+		Input string
+		Output string
+	}{
+		{
+			Name: "can parse a typical input",
+			Input: "jhsd3jhsd44hjoned",
+			Output: "jhsd3jhsd44hj1kd",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.Name, func(t *testing.T) {
+			ReplaceMatches(&tt.Input, matches)
+			if tt.Input != tt.Output {
+				t.Errorf("got %s, wanted %s", tt.Input, tt.Output)
+			}
+		})
+	}
+}
+
 func TestParseString(t *testing.T) {
 	tests := []struct {
 		Name string
