@@ -48,15 +48,41 @@ func main() {
 	}
 	almanac = append(almanac, current)
 
-	lowestSoil := math.MaxInt
-	for _, seed := range GetSeeds(lines[0]) {
-		soil := CalculateSoil(seed, almanac)
-		if soil < int(lowestSoil) {
-			lowestSoil = soil
+	seeds := GetSeeds(lines[0])
+
+	part1 := math.MaxInt
+	// for _, seed := range seeds {
+	// 	fmt.Println(seed)
+	// 	location := CalculateSoil(seed, almanac)
+	// 	if location < int(part1) {
+	// 		part1 = location
+	// 	}
+	// }
+
+	// lowestSoil := math.MaxInt
+	// for _, seed := range GetSeeds(lines[0]) {
+	// 	fmt.Println(seed)
+	// 	soil := CalculateSoil(seed, almanac)
+	// 	fmt.Println(soil)
+	// 	if soil < int(lowestSoil) {
+	// 		lowestSoil = soil
+	// 	}
+	// }
+
+	part2 := math.MaxInt
+	for i := 0; i < len(seeds)-1; i += 2 {
+		pointer := seeds[i]
+		end := seeds[i+1]
+		for pointer < seeds[i]+end {
+			location := CalculateSoil(pointer, almanac)
+			if location < int(part2) {
+				part2 = location
+			}
+			pointer += 1
 		}
 	}
 
-	fmt.Println(lowestSoil)
+	fmt.Println(part1, part2)
 }
 
 func GetSeeds(input string) []int {
@@ -76,7 +102,7 @@ func GetSeeds(input string) []int {
 func CalculateSoil(seed int, almanac []Conversion) int {
 	for _, conversion := range almanac {
 		for i, r := range conversion.Ranges {
-			if seed >= r[0] && seed < r[1] {
+			if seed >= r[0] && seed <= r[1] {
 				seed += conversion.Offset[i]
 				break
 			}
