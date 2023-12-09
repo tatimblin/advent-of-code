@@ -35,38 +35,43 @@ func main() {
 	// 	{Time: 88, Distance: 1127},
 	// 	{Time: 94, Distance: 1055},
 	// }
+	// races := []Race{
+	// 	{Time: 7, Distance: 9},
+	// 	{Time: 15, Distance: 40},
+	// 	{Time: 30, Distance: 200},
+	// }
 	races := []Race{
-		{Time: 7, Distance: 9},
-		{Time: 15, Distance: 40},
-		{Time: 30, Distance: 200},
+		{Time: 41968894, Distance: 214178911271055},
 	}
 
+	part1 := 1
 	for _, race := range races {
 		optimalHold := race.Time / 2
 		// optimalDistance := CalcDistance(race.Time, optimalHold)
 
-		nearestHold := FindHold(race, optimalHold/2, optimalHold)
-		// possibilities := nearestHold * 2
-		fmt.Println(nearestHold, nearestHold+optimalHold)
+		min := FindHold(race, 0, optimalHold)
+		max := race.Time - min
+		part1 *= max - min + 1
 	}
 
-	fmt.Println(races, races[0].Time%2)
+	fmt.Println(part1)
 }
 
 func CalcDistance(total, hold int) int {
 	return (total - hold) * hold
 }
 
-func FindHold(race Race, pivot int, size int) int {
+func FindHold(race Race, left int, right int) int {
+	pivot := left + (right-left)/2
 	distance := CalcDistance(race.Time, pivot)
 
-	if size == 0 {
+	if left >= right {
 		return pivot
 	}
 
-	if race.Distance > distance {
-		return FindHold(race, pivot+(size/2), size/2)
+	if race.Distance >= distance {
+		return FindHold(race, pivot+1, right)
 	} else {
-		return FindHold(race, pivot-(size/2), size/2)
+		return FindHold(race, left, pivot)
 	}
 }
