@@ -69,7 +69,6 @@ func main() {
 		item := heap.Pop(&pq).(*Item)
 		multiplier := len(lines) - pq.Len()
 		part1 += item.Value.Bid * multiplier
-		// fmt.Println(item.Value)
 	}
 
 	fmt.Println(part1)

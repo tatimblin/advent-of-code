@@ -93,9 +93,6 @@ func getType(cards []string) int {
 	}
 
 	result += history["J"]
-	if history["J"] > 2 {
-		fmt.Println(result, cards)
-	}
 
 	// high card
 	return result
