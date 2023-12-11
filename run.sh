@@ -42,7 +42,7 @@ fi
 cd "$year/$day"
 
 if [ "$test" = true ]; then
-  go test
+  go test ./...
 else
   go run main.go
 fi

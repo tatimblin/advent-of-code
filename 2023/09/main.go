@@ -14,6 +14,7 @@ func main() {
 
 	lines, err := util.ReadLines("input.txt")
 	if err != nil {
+		fmt.Println("could not parse input file")
 		return
 	}
 
@@ -23,6 +24,8 @@ func main() {
 			History: [][]int{parsed},
 		}
 		log.CalculateDifferences()
+		part1 += log.AddEstimates()
+		part2 += log.AddEstimatesLeft()
 	}
 
 	fmt.Println(part1, part2)
@@ -34,7 +37,7 @@ func parseLine(line string) []int {
 	for i, str := range strs {
 		number, err := strconv.Atoi(str)
 		if err != nil {
-			fmt.Errorf("could not convert %s to a number", str)
+			fmt.Printf("could not convert %s to a number\n", str)
 		}
 		result[i] = number
 	}
