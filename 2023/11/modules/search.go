@@ -1,6 +1,8 @@
 package module
 
-import "fmt"
+import (
+	"math"
+)
 
 type Galaxy struct {
 	ID    int
@@ -10,55 +12,46 @@ type Galaxy struct {
 }
 
 type Search interface {
-	Traverse()
-	CreateGalaxies()
+	CalculateDistance(from Galaxy, to Galaxy) int
+	CountRange(arr []int, from int, to int) int
 }
 
-func (u *Universe) Traverse(galaxy Galaxy) {
-	queue := [][3]int{{galaxy.Y, galaxy.X, 0}}
-
-	func bfs() {
-		coords, q := dequeue(queue)
-		queue = q
-
-		for _, offset := range [4][2]int{{0, 1}, {1, 0}, {0, -1}, {-1, 0}} {
-			y := coords[0] + offset[0]
-			x := coords[1] + offset[1]
-			enqueue(queue, [3]int{y, x, coords[2]+1})
-		}
-	}
+func CalculateDistance(from Galaxy, to Galaxy) int {
+	xDistance := math.Abs(float64(from.X) - float64(to.X))
+	yDistance := math.Abs(float64(from.Y) - float64(to.Y))
+	return int(xDistance + yDistance)
 }
 
-func enqueue(queue [][3]int, element [3]int) [][3]int {
-	queue = append(queue, element)
-	return queue
-}
+func CountRange(arr []int, from int, to int) int {
+	left := 0
+	right := len(arr)
+	low := min(from, to)
+	high := max(from, to)
 
-func dequeue(queue [][3]int) ([3]int, [][3]int) {
-	element := queue[0]
-	if len(queue) == 1 {
-		temp := [][3]int{}
-		return element, temp
-	}
-	return element, queue[1:]
-}
-
-func (u *Universe) CreateGalaxies() []Galaxy {
-	galaxies := []Galaxy{}
-	var count int
-
-	for y := range *u {
-		for x, cell := range (*u)[y] {
-			if cell == "#" {
-				galaxies = append(galaxies, Galaxy{
-					ID: count,
-					X:  x,
-					Y:  y,
-				})
-				count += 1
-			}
+	for low > arr[left] {
+		left += 1
+		if left == len(arr) {
+			break
 		}
 	}
 
-	return galaxies
+	for right > 0 && high < arr[right-1] {
+		right -= 1
+	}
+
+	return right - left
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
 }

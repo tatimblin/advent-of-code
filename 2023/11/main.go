@@ -25,14 +25,20 @@ func main() {
 	universe := module.Universe{}
 	for _, line := range lines {
 		chars := strings.Split(line, "")
-		universe = append(universe, chars)
+		universe.Matrix = append(universe.Matrix, chars)
 	}
 
-	universe.Expand() // does not scale for part 2 :(
+	universe.Expand()
 	galaxies := universe.CreateGalaxies()
 
-	for i := 0; i < len(galaxies); i++ {
-		universe.BFS(galaxies[i])
+	for offset, fromGalaxy := range galaxies {
+		for i := offset + 1; i < len(galaxies); i++ {
+			toGalaxy := galaxies[i]
+			distance := module.CalculateDistance(fromGalaxy, toGalaxy)
+			expansions := module.CountRange(universe.ExpandY, fromGalaxy.X, toGalaxy.X) + module.CountRange(universe.ExpandX, fromGalaxy.Y, toGalaxy.Y)
+			part1 += distance + expansions
+			part2 += distance + (expansions * 999999)
+		}
 	}
 
 	fmt.Println(part1, part2)
