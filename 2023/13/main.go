@@ -7,8 +7,13 @@ import (
 	"github.com/tatimblin/advent-of-code/go-util"
 )
 
+var SMUDGE_COUNT int
+var smudges int
+
 func main() {
-	var part1, part2 int
+	var result int
+
+	SMUDGE_COUNT = 1
 
 	lines, err := util.ReadLines("input.txt")
 	if err != nil {
@@ -21,14 +26,14 @@ func main() {
 		if line == "" {
 			vertical := matrix.scanLeft()
 			horizontal := matrix.scanDown()
-			part1 += vertical + (100 * horizontal)
+			result += vertical + (100 * horizontal)
 			matrix = Matrix{}
 		} else {
 			matrix = append(matrix, strings.Split(line, ""))
 		}
 	}
 
-	fmt.Println(part1, part2)
+	fmt.Println(result)
 }
 
 type Matrix [][]string
@@ -53,7 +58,11 @@ func isEqual(a, b []string) bool {
 
 	for i := 0; i < len(a); i++ {
 		if a[i] != b[i] {
-			return false
+			if smudges < SMUDGE_COUNT {
+				smudges += 1
+			} else {
+				return false
+			}
 		}
 	}
 
@@ -66,6 +75,7 @@ func (m *Matrix) scanDown() int {
 	for i := 0; i < size; i++ {
 		top := m.getRow(i)
 		bottom := m.getRow(i + 1)
+		smudges = 0
 		if isEqual(top, bottom) {
 			t := i
 			b := i + 1
@@ -80,7 +90,7 @@ func (m *Matrix) scanDown() int {
 				}
 			}
 
-			if t == 0 || b == size {
+			if (t == 0 || b == size) && smudges == SMUDGE_COUNT {
 				return i + 1
 			}
 		}
@@ -95,6 +105,7 @@ func (m *Matrix) scanLeft() int {
 	for i := 0; i < size; i++ {
 		left := m.getCol(i)
 		right := m.getCol(i + 1)
+		smudges = 0
 		if isEqual(left, right) {
 			l := i
 			r := i + 1
@@ -109,7 +120,7 @@ func (m *Matrix) scanLeft() int {
 				}
 			}
 
-			if l == 0 || r == size {
+			if (l == 0 || r == size) && smudges == SMUDGE_COUNT {
 				return i + 1
 			}
 		}
