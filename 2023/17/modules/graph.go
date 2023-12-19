@@ -1,72 +1,60 @@
 package modules
 
-import (
-	"container/heap"
-	"math"
-)
+import "fmt"
 
 type Matrix [][]int
 
 type Coordinate [2]int
-
-type Graph struct {
-	Edges     map[int][]Edge
-	Verticies map[int]*Vertex
-	Queue     MinHeap
+type Step struct {
+	Coordinate Coordinate
+	Direction  Direction
 }
 
 type Edge struct {
 	To     int
 	Weight int
+	Depth  int
+	Direction
 }
 
-type Vertex struct {
-	ID         int
-	Distance   int
-	Directions []Direction
-	index      int
-}
+type Graph map[int][]Edge
 
-func CreateGraph(matrix Matrix) Graph {
-	var graph Graph
-	graph.Edges = make(map[int][]Edge)
-	graph.Verticies = map[int]*Vertex{}
-	graph.Queue = make(MinHeap, len(matrix)*len(matrix[0]))
+func CreateGraph(matrix Matrix, min int, max int) Graph {
+	edges := make(map[int][]Edge)
+	steps := []Step{
+		{Coordinate: [2]int{0, 1}, Direction: Right},
+		{Coordinate: [2]int{1, 0}, Direction: Down},
+		{Coordinate: [2]int{0, -1}, Direction: Left},
+		{Coordinate: [2]int{-1, 0}, Direction: Up},
+	}
 
 	for i := 0; i < len(matrix); i++ {
 		for j := 0; j < len(matrix[0]); j++ {
 			fromID := i*len(matrix[0]) + j
 
-			v := &Vertex{
-				ID:       fromID,
-				Distance: initDistance(i, j, matrix[0][0]),
-				index:    fromID,
-			}
-
-			graph.Verticies[fromID] = v
-			graph.Queue[fromID] = v
-			for _, adjacent := range [4]Coordinate{{0, 1}, {1, 0}, {0, -1}, {-1, 0}} {
-				ii := i + adjacent[0]
-				jj := j + adjacent[1]
-
-				if matrix.isCoordinate(Coordinate{i, j}) && matrix.isCoordinate(Coordinate{ii, jj}) {
-					toID := ii*len(matrix[ii]) + jj
-					graph.addEdge(fromID, toID, matrix[ii][jj])
+			for _, step := range steps {
+				var weight int
+				for depth := min; depth < max; depth++ {
+					ii := i + step.Coordinate[0]*depth
+					jj := j + step.Coordinate[1]*depth
+					if matrix.isCoordinate(Coordinate{i, j}) && matrix.isCoordinate(Coordinate{ii, jj}) {
+						weight += matrix[ii][jj]
+						toID := ii*len(matrix[ii]) + jj
+						edges[fromID] = append(edges[fromID], Edge{
+							To:        toID,
+							Weight:    weight,
+							Depth:     depth,
+							Direction: step.Direction,
+						})
+					}
 				}
 			}
 		}
 	}
 
-	heap.Init(&graph.Queue)
+	fmt.Println(edges[0])
 
-	return graph
-}
-
-func initDistance(i, j, distance int) int {
-	if i == 0 && j == 0 {
-		return distance
-	}
-	return math.MaxInt
+	return edges
 }
 
 func (matrix Matrix) isCoordinate(coord Coordinate) bool {
@@ -76,11 +64,4 @@ func (matrix Matrix) isCoordinate(coord Coordinate) bool {
 		return false
 	}
 	return true
-}
-
-func (graph *Graph) addEdge(from int, to int, weight int) {
-	(*graph).Edges[from] = append((*graph).Edges[from], Edge{
-		To:     to,
-		Weight: weight,
-	})
 }

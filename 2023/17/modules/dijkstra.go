@@ -2,6 +2,7 @@ package modules
 
 import (
 	"container/heap"
+	"fmt"
 )
 
 type Direction int
@@ -14,63 +15,89 @@ const (
 	Down    Direction = 4
 )
 
-func Dijkstra(graph Graph, maxStraight int) int {
+type Vertex struct {
+	ID        int
+	Distance  int
+	Direction Direction
+	SinceTurn int
+	index     int
+}
 
-	for graph.Queue.Len() > 0 {
-		pointer := heap.Pop(&graph.Queue).(*Vertex)
+type MinHeap []*Vertex
 
-		if pointer.ID == len(graph.Verticies)-1 {
-			return pointer.Distance
-		}
+func (h MinHeap) Len() int           { return len(h) }
+func (h MinHeap) Less(i, j int) bool { return h[i].Distance < h[j].Distance }
 
-		for _, edge := range graph.Edges[pointer.ID] {
-			distance := pointer.Distance + edge.Weight
-			if distance < graph.Verticies[edge.To].Distance {
-				direction := getDirection(pointer.ID, edge.To, 13)
-				// if exceedsConsecutiveLimit(pointer.Directions, direction, maxStraight) {
-				// 	continue
-				// }
+func (h MinHeap) Swap(i, j int) {
+	h[i], h[j] = h[j], h[i]
+	h[i].index = i
+	h[j].index = j
+}
 
-				graph.Queue.Update(
-					graph.Verticies[edge.To],
-					distance,
-					append(pointer.Directions, direction),
-				)
+func (h *MinHeap) Push(x interface{}) {
+	item := x.(*Vertex)
+	item.index = len(*h)
+	*h = append(*h, item)
+}
+
+func (h *MinHeap) Pop() interface{} {
+	old := *h
+	n := len(old)
+	x := old[n-1]
+	x.index = -1
+	*h = old[0 : n-1]
+	return x
+}
+
+func Dijkstra(graph Graph, source *Vertex, end *Vertex) int {
+	distances := make(map[int]int)
+
+	for vertex := range graph {
+		distances[vertex] = int(^uint(0) >> 1)
+	}
+	distances[source.ID] = source.Distance
+
+	pq := &MinHeap{source}
+	heap.Init(pq)
+
+	for pq.Len() > 0 {
+		currentVertex := heap.Pop(pq).(*Vertex)
+
+		for _, edge := range graph[currentVertex.ID] {
+			neighbor := edge.To
+			newDistance := currentVertex.Distance + edge.Weight
+
+			if newDistance < distances[neighbor] {
+				distances[neighbor] = newDistance
+
+				sinceTurn := currentVertex.SinceTurn + edge.Depth
+
+				if (currentVertex.Direction == Up && edge.Direction == Down) ||
+					(currentVertex.Direction == Down && edge.Direction == Up) ||
+					(currentVertex.Direction == Left && edge.Direction == Right) ||
+					(currentVertex.Direction == Right && edge.Direction == Left) {
+					continue
+				}
+
+				if currentVertex.Direction != edge.Direction && currentVertex.Direction != Unknown {
+					sinceTurn = 0
+				}
+
+				if sinceTurn > 3 {
+					continue
+				}
+
+				heap.Push(pq, &Vertex{
+					ID:        neighbor,
+					Distance:  newDistance,
+					Direction: edge.Direction,
+					SinceTurn: sinceTurn,
+				})
 			}
 		}
 	}
 
-	return -1
-}
+	fmt.Println(distances)
 
-func getDirection(from, to, size int) Direction {
-	if from+1 == to {
-		return Right
-	}
-	if from-1 == to {
-		return Left
-	}
-	if from+1 < to {
-		return Down
-	}
-	if from-1 > to {
-		return Up
-	}
-	return Unknown
-}
-
-func exceedsConsecutiveLimit(prev []Direction, new Direction, limit int) bool {
-	if len(prev) < limit {
-		return false
-	}
-
-	var consecutive int
-	for i := len(prev) - 1; i >= 0; i-- {
-		if prev[i] != new {
-			break
-		}
-		consecutive += 1
-	}
-
-	return consecutive >= limit
+	return distances[end.ID]
 }
