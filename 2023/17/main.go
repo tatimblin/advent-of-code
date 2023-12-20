@@ -19,23 +19,11 @@ func main() {
 		return
 	}
 
-	end := len(matrix)*len(matrix[0]) - 1
-	graph := modules.CreateGraph(matrix, 1, 3)
-	for _, g := range graph {
-		fmt.Println(g)
-	}
-	result = modules.Dijkstra(
-		graph,
-		&modules.Vertex{
-			ID:        0,
-			Distance:  matrix[0][0],
-			SinceTurn: 1,
-			Direction: modules.Unknown,
-		},
-		&modules.Vertex{
-			ID: end,
-		},
-	)
+	min, max := 3, 10
+	start, end := 0, len(matrix)*len(matrix[0])-1
+
+	graph := modules.CreateGraph(matrix, min, max)
+	result = modules.Dijkstra(graph, max, start, end)
 
 	fmt.Println(result)
 }

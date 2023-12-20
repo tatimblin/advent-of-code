@@ -49,15 +49,15 @@ func (h *MinHeap) Pop() interface{} {
 	return x
 }
 
-func Dijkstra(graph Graph, source *Vertex, end *Vertex) int {
+func Dijkstra(graph Graph, max int, start int, end int) int {
 	distances := make(map[int]int)
 
 	for vertex := range graph {
 		distances[vertex] = int(^uint(0) >> 1)
 	}
-	distances[source.ID] = source.Distance
+	distances[start] = 2
 
-	pq := &MinHeap{source}
+	pq := &MinHeap{&Vertex{ID: start, SinceTurn: 1, Direction: Unknown, Distance: 2}}
 	heap.Init(pq)
 
 	for pq.Len() > 0 {
@@ -83,7 +83,7 @@ func Dijkstra(graph Graph, source *Vertex, end *Vertex) int {
 					sinceTurn = 0
 				}
 
-				if sinceTurn > 3 {
+				if sinceTurn > max {
 					continue
 				}
 
@@ -99,5 +99,5 @@ func Dijkstra(graph Graph, source *Vertex, end *Vertex) int {
 
 	fmt.Println(distances)
 
-	return distances[end.ID]
+	return distances[end]
 }

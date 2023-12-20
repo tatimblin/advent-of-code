@@ -1,7 +1,5 @@
 package modules
 
-import "fmt"
-
 type Matrix [][]int
 
 type Coordinate [2]int
@@ -34,7 +32,7 @@ func CreateGraph(matrix Matrix, min int, max int) Graph {
 
 			for _, step := range steps {
 				var weight int
-				for depth := min; depth < max; depth++ {
+				for depth := min; depth < max-1; depth++ {
 					ii := i + step.Coordinate[0]*depth
 					jj := j + step.Coordinate[1]*depth
 					if matrix.isCoordinate(Coordinate{i, j}) && matrix.isCoordinate(Coordinate{ii, jj}) {
@@ -51,8 +49,6 @@ func CreateGraph(matrix Matrix, min int, max int) Graph {
 			}
 		}
 	}
-
-	fmt.Println(edges[0])
 
 	return edges
 }
